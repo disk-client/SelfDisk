@@ -1,7 +1,7 @@
 /*
  * @Author: 肖博雅
  * @Date: 2020-06-15 21:14:59
- * @LastEditTime: 2020-06-18 11:37:30
+ * @LastEditTime: 2020-06-19 10:44:54
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/args/aboutAdmin.go
@@ -14,6 +14,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"fmt"
 )
 
 // RegisterParams 注册参数
@@ -78,6 +79,7 @@ func (info *LoginParams) Check() error {
 	var credByte = []byte(cred)
 	hash.Write(credByte)
 	cred = hex.EncodeToString(hash.Sum(nil))
+	fmt.Println(cred)
 	var theSQL = `
 		select count(1) from username=$1 and password=$2;
 	`
