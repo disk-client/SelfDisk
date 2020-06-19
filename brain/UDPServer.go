@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-19 14:08:25
+ * @LastEditTime: 2020-06-19 14:20:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -28,7 +28,7 @@ func UDPServer() {
 	for {
 		n, remoteAddr, err := listener.ReadFromUDP(data)
 		if err != nil {
-			fmt.Printf("error during read: %s", err)
+			fmt.Println("error during read: ", err)
 		}
 		var content = string(data[:n])
 		var clientType = content[:1]
@@ -37,7 +37,7 @@ func UDPServer() {
 		case "c":
 			tableName = "t_client"
 		case "s":
-			tableName = "t_client"
+			tableName = "t_server"
 		}
 		var username = content[1:]
 		var theSQL = `
@@ -46,7 +46,7 @@ func UDPServer() {
 		var uid int
 		err = diskutils.TheDB.GetOne(theSQL, []interface{}{username}, []interface{}{&uid})
 		if err != nil {
-			fmt.Printf("error during auth: %s", "用户不存在")
+			fmt.Printf("error during auth: no user")
 		}
 		theSQL = `
 			select count(1) from %s where userid=$1;
@@ -63,7 +63,8 @@ func UDPServer() {
 				VALUES($1, $2, $3);
 			`
 			theSQL = fmt.Sprintf(theSQL, tableName)
-			utils.TheDB.InsertSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
+			err = utils.TheDB.InsertSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
+			fmt.Println(err)
 		} else {
 			theSQL = `
 				UPDATE %s
