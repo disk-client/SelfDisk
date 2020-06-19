@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-19 14:20:57
+ * @LastEditTime: 2020-06-19 14:27:27
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -54,8 +54,8 @@ func UDPServer() {
 		theSQL = fmt.Sprintf(theSQL, tableName)
 		var isExist int
 		diskutils.TheDB.GetOne(theSQL, []interface{}{uid}, []interface{}{&isExist})
-		var selfDiskIP = remoteAddr.IP
-		var selfDiskPort = remoteAddr.Port
+		var selfDiskIP = string(remoteAddr.IP)
+		var selfDiskPort = string(remoteAddr.Port)
 		if isExist < 1 {
 			theSQL = `
 				INSERT INTO %s
