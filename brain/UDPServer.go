@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-19 14:27:27
+ * @LastEditTime: 2020-06-19 14:35:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -18,7 +18,6 @@ import (
 
 // UDPServer UDP打洞的服务端，用以给两个客户端获取IP地址
 func UDPServer() {
-	fmt.Println("开始UDP情况")
 	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.IPv4zero, Port: 9201})
 	if err != nil {
 		fmt.Println(err)
@@ -63,6 +62,7 @@ func UDPServer() {
 				VALUES($1, $2, $3);
 			`
 			theSQL = fmt.Sprintf(theSQL, tableName)
+			fmt.Println(selfDiskIP, selfDiskPort)
 			err = utils.TheDB.InsertSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
 			fmt.Println(err)
 		} else {
