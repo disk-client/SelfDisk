@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 17:42:23
- * @LastEditTime: 2020-06-19 10:03:23
+ * @LastEditTime: 2020-06-19 10:06:07
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/dbCode.go
@@ -84,6 +84,7 @@ func (db *DisktDB) DeleteSQL(execsql string, params []interface{}) {
 
 // InsertSQL 进行数据库的insert操作，不返回结果
 func (db *DisktDB) InsertSQL(execsql string, params []interface{}) error {
+	fmt.Println(db)
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
