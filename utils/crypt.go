@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-17 16:15:46
- * @LastEditTime: 2020-06-17 16:52:31
+ * @LastEditTime: 2020-06-19 09:16:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/crypt.go
@@ -40,6 +40,7 @@ func CryptMsg(msgIn string) string {
 	var enCryptMsg = ""
 	var i = 0
 	var tLen = len(msg)
+	fmt.Println(PubKey)
 	for i < tLen {
 		var content []byte
 		if tLen > i+settings.CryptSegLen {
@@ -168,6 +169,7 @@ func InitKeys() {
 	}
 	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if pubKey == nil {
+		CheckErr(err)
 		return
 	}
 	value, ok := pubKey.(*rsa.PublicKey)
