@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-19 14:35:47
+ * @LastEditTime: 2020-06-19 14:44:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -14,6 +14,7 @@ import (
 	diskutils "SelfDisk/utils"
 	"fmt"
 	"net"
+	"strconv"
 )
 
 // UDPServer UDP打洞的服务端，用以给两个客户端获取IP地址
@@ -53,8 +54,8 @@ func UDPServer() {
 		theSQL = fmt.Sprintf(theSQL, tableName)
 		var isExist int
 		diskutils.TheDB.GetOne(theSQL, []interface{}{uid}, []interface{}{&isExist})
-		var selfDiskIP = string(remoteAddr.IP)
-		var selfDiskPort = string(remoteAddr.Port)
+		var selfDiskIP = remoteAddr.IP.String()
+		var selfDiskPort = strconv.Itoa(remoteAddr.Port)
 		if isExist < 1 {
 			theSQL = `
 				INSERT INTO %s
