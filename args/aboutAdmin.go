@@ -1,7 +1,7 @@
 /*
  * @Author: 肖博雅
  * @Date: 2020-06-15 21:14:59
- * @LastEditTime: 2020-06-19 10:44:54
+ * @LastEditTime: 2020-06-19 10:48:28
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/args/aboutAdmin.go
@@ -81,7 +81,7 @@ func (info *LoginParams) Check() error {
 	cred = hex.EncodeToString(hash.Sum(nil))
 	fmt.Println(cred)
 	var theSQL = `
-		select count(1) from username=$1 and password=$2;
+		select count(1) from t_user where username=$1 and password=$2;
 	`
 	var n int
 	var err = utils.TheDB.GetOne(theSQL, []interface{}{info.Name, cred}, []interface{}{&n})
