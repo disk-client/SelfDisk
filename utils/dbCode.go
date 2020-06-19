@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 17:42:23
- * @LastEditTime: 2020-06-19 09:55:20
+ * @LastEditTime: 2020-06-19 10:03:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/dbCode.go
@@ -28,7 +28,7 @@ type DisktDB struct {
 var TheDB = DisktDB{Name: "postgres", Password: "postgres", DBname: "postgres", Sslmode: "disable", Host: "127.0.0.1", Port: "54320"}
 
 // SelectSQL 获取select语句的结果，且结果为0到多条
-func (db DisktDB) SelectSQL(execsql string, args ...interface{}) *sql.Rows {
+func (db *DisktDB) SelectSQL(execsql string, args ...interface{}) *sql.Rows {
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
@@ -40,7 +40,7 @@ func (db DisktDB) SelectSQL(execsql string, args ...interface{}) *sql.Rows {
 }
 
 //GetOne 获取select语句的结果，且结果为1条
-func (db DisktDB) GetOne(execsql string, params []interface{}, res []interface{}) error {
+func (db *DisktDB) GetOne(execsql string, params []interface{}, res []interface{}) error {
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
@@ -57,7 +57,7 @@ func (db DisktDB) GetOne(execsql string, params []interface{}, res []interface{}
 }
 
 // UpdateSQL 进行数据库的update操作，不返回结果
-func (db DisktDB) UpdateSQL(execsql string, params []interface{}) {
+func (db *DisktDB) UpdateSQL(execsql string, params []interface{}) {
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
@@ -70,7 +70,7 @@ func (db DisktDB) UpdateSQL(execsql string, params []interface{}) {
 }
 
 // DeleteSQL 进行数据库的delete操作，不返回结果
-func (db DisktDB) DeleteSQL(execsql string, params []interface{}) {
+func (db *DisktDB) DeleteSQL(execsql string, params []interface{}) {
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
@@ -83,7 +83,7 @@ func (db DisktDB) DeleteSQL(execsql string, params []interface{}) {
 }
 
 // InsertSQL 进行数据库的insert操作，不返回结果
-func (db DisktDB) InsertSQL(execsql string, params []interface{}) error {
+func (db *DisktDB) InsertSQL(execsql string, params []interface{}) error {
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
