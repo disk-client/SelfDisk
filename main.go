@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-13 21:49:06
- * @LastEditTime: 2020-06-18 11:21:50
+ * @LastEditTime: 2020-06-19 10:23:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/main.go
@@ -15,6 +15,7 @@ import (
 	"SelfDisk/utils"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 )
 
 func main() {
