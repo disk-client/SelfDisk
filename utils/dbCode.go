@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 17:42:23
- * @LastEditTime: 2020-06-18 16:10:08
+ * @LastEditTime: 2020-06-19 09:55:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/dbCode.go
@@ -11,6 +11,7 @@ package utils
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 // DisktDB PostgreSQL数据库连接
@@ -19,16 +20,18 @@ type DisktDB struct {
 	Password string
 	DBname   string
 	Sslmode  string
+	Host     string
+	Port     string
 }
 
 // TheDB 数据库
-var TheDB = DisktDB{Name: "postgres", Password: "postgres", DBname: "postgres", Sslmode: "disable"}
+var TheDB = DisktDB{Name: "postgres", Password: "postgres", DBname: "postgres", Sslmode: "disable", Host: "127.0.0.1", Port: "54320"}
 
 // SelectSQL 获取select语句的结果，且结果为0到多条
 func (db DisktDB) SelectSQL(execsql string, args ...interface{}) *sql.Rows {
 	var conn = new(sql.DB)
 	var err error
-	conn, err = sql.Open("postgres", "user="+db.Name+" dbname="+db.DBname+" password="+db.Password+" sslmode="+db.Sslmode)
+	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
 	CheckErr(err)
 	rows, err := conn.Query(execsql, args...)
 	CheckErr(err)
@@ -40,7 +43,7 @@ func (db DisktDB) SelectSQL(execsql string, args ...interface{}) *sql.Rows {
 func (db DisktDB) GetOne(execsql string, params []interface{}, res []interface{}) error {
 	var conn = new(sql.DB)
 	var err error
-	conn, err = sql.Open("postgres", "user="+db.Name+" dbname="+db.DBname+" password="+db.Password+" sslmode="+db.Sslmode)
+	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
 	if err != nil {
 		return err
 	}
@@ -57,7 +60,7 @@ func (db DisktDB) GetOne(execsql string, params []interface{}, res []interface{}
 func (db DisktDB) UpdateSQL(execsql string, params []interface{}) {
 	var conn = new(sql.DB)
 	var err error
-	conn, err = sql.Open("postgres", "user="+db.Name+" dbname="+db.DBname+" password="+db.Password+" sslmode="+db.Sslmode)
+	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
 	CheckErr(err)
 	s, err := conn.Prepare(execsql)
 	CheckErr(err)
@@ -70,7 +73,7 @@ func (db DisktDB) UpdateSQL(execsql string, params []interface{}) {
 func (db DisktDB) DeleteSQL(execsql string, params []interface{}) {
 	var conn = new(sql.DB)
 	var err error
-	conn, err = sql.Open("postgres", "user="+db.Name+" dbname="+db.DBname+" password="+db.Password+" sslmode="+db.Sslmode)
+	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
 	CheckErr(err)
 	s, err := conn.Prepare(execsql)
 	CheckErr(err)
@@ -83,7 +86,7 @@ func (db DisktDB) DeleteSQL(execsql string, params []interface{}) {
 func (db DisktDB) InsertSQL(execsql string, params []interface{}) error {
 	var conn = new(sql.DB)
 	var err error
-	conn, err = sql.Open("postgres", "user="+db.Name+" dbname="+db.DBname+" password="+db.Password+" sslmode="+db.Sslmode)
+	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
 	defer conn.Close()
 	if err != nil {
 		return err
