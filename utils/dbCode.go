@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 17:42:23
- * @LastEditTime: 2020-06-19 10:06:07
+ * @LastEditTime: 2020-06-19 10:11:04
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/dbCode.go
@@ -88,8 +88,8 @@ func (db *DisktDB) InsertSQL(execsql string, params []interface{}) error {
 	var conn = new(sql.DB)
 	var err error
 	conn, err = sql.Open("postgres", fmt.Sprintf("user=%s dbname=%s password=%s sslmode=%s host=%s port=%s", db.Name, db.DBname, db.Password, db.Sslmode, db.Host, db.Port))
-	defer conn.Close()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	s, err := conn.Prepare(execsql)
