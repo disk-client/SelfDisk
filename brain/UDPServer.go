@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-18 10:43:58
+ * @LastEditTime: 2020-06-19 13:38:08
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -29,35 +29,47 @@ func UDPServer() {
 		if err != nil {
 			fmt.Printf("error during read: %s", err)
 		}
-		var username = string(data[:n])
+		var content = string(data[:n])
+		var clientType = content[:1]
+		var tableName string
+		switch clientType {
+		case "c":
+			tableName = "t_client"
+		case "s":
+			tableName = "t_client"
+		}
+		var username = content[1:]
 		var theSQL = `
 			select id from t_user where username=$1;
 		`
 		var uid int
 		err = diskutils.TheDB.GetOne(theSQL, []interface{}{username}, []interface{}{&uid})
 		if err != nil {
-
+			fmt.Printf("error during auth: %s", "用户不存在")
 		}
 		theSQL = `
-			select count(1) from t_server where userid=$1;
+			select count(1) from %s where userid=$1;
 		`
+		theSQL = fmt.Sprintf(theSQL, tableName)
 		var isExist int
 		diskutils.TheDB.GetOne(theSQL, []interface{}{uid}, []interface{}{&isExist})
 		var selfDiskIP = remoteAddr.IP
 		var selfDiskPort = remoteAddr.Port
-		if isExist > 1 {
+		if isExist < 1 {
 			theSQL = `
-				INSERT INTO public.t_server
+				INSERT INTO %s
 				(ipaddr, port, userid)
-				VALUES($1, $2, $3);			
+				VALUES($1, $2, $3);
 			`
+			theSQL = fmt.Sprintf(theSQL, tableName)
 			utils.TheDB.InsertSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
 		} else {
 			theSQL = `
-				UPDATE public.t_server
+				UPDATE %s
 				SET ipaddr=$1, port=$2
 				WHERE userid=$3;
 			`
+			theSQL = fmt.Sprintf(theSQL, tableName)
 			utils.TheDB.UpdateSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
 		}
 	}
