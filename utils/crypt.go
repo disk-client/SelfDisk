@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-17 16:15:46
- * @LastEditTime: 2020-06-19 09:16:13
+ * @LastEditTime: 2020-06-19 09:29:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/crypt.go
@@ -40,7 +40,6 @@ func CryptMsg(msgIn string) string {
 	var enCryptMsg = ""
 	var i = 0
 	var tLen = len(msg)
-	fmt.Println(PubKey)
 	for i < tLen {
 		var content []byte
 		if tLen > i+settings.CryptSegLen {
@@ -107,16 +106,21 @@ func ReqReturn(msg string, succ bool, data interface{}, noCrypt bool, req Reques
 	}
 	jsonRes, err := json.Marshal(res)
 	CheckErr(err)
-
-	if noCrypt == true {
+	if settings.DeBug {
 		req.Request.JSON(200, gin.H{
-			"data": "0" + string(jsonRes),
+			"data": res,
 		})
 	} else {
-		var endRes = CryptMsg(string(jsonRes))
-		req.Request.JSON(200, gin.H{
-			"data": "1" + endRes,
-		})
+		if noCrypt == true {
+			req.Request.JSON(200, gin.H{
+				"data": "0" + string(jsonRes),
+			})
+		} else {
+			var endRes = CryptMsg(string(jsonRes))
+			req.Request.JSON(200, gin.H{
+				"data": "1" + endRes,
+			})
+		}
 	}
 }
 
