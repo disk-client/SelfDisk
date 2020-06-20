@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-20 09:33:17
+ * @LastEditTime: 2020-06-20 09:42:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -31,7 +31,6 @@ func UDPServer() {
 			fmt.Println("error during read: ", err)
 		}
 		var content = string(data[:n])
-		fmt.Println(content)
 		var clientType = content[:1]
 		var tableName string
 		switch clientType {
@@ -66,9 +65,7 @@ func UDPServer() {
 				VALUES($1, $2, $3);
 			`
 			theSQL = fmt.Sprintf(theSQL, tableName)
-			fmt.Println(selfDiskIP, selfDiskPort)
 			err = utils.TheDB.InsertSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
-			fmt.Println(err)
 		} else {
 			theSQL = `
 				UPDATE %s
