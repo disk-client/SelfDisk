@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 21:12:03
- * @LastEditTime: 2020-06-19 15:24:13
+ * @LastEditTime: 2020-06-20 16:47:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/views/admin.go

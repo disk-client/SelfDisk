@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-15 17:42:23
- * @LastEditTime: 2020-06-19 14:35:34
+ * @LastEditTime: 2020-06-20 16:33:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/utils/dbCode.go
@@ -24,8 +24,11 @@ type DisktDB struct {
 	Port     string
 }
 
-// TheDB 数据库
-var TheDB = DisktDB{Name: "postgres", Password: "postgres", DBname: "postgres", Sslmode: "disable", Host: "127.0.0.1", Port: "54320"}
+// GetConn 获取连接
+func GetConn() DisktDB {
+	var TheDB = DisktDB{Name: "postgres", Password: "postgres", DBname: "postgres", Sslmode: "disable", Host: "127.0.0.1", Port: "54320"}
+	return TheDB
+}
 
 // SelectSQL 获取select语句的结果，且结果为0到多条
 func (db *DisktDB) SelectSQL(execsql string, args ...interface{}) *sql.Rows {

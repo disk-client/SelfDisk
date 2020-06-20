@@ -1,7 +1,7 @@
 /*
  * @Author: 肖博雅
  * @Date: 2020-06-15 21:14:59
- * @LastEditTime: 2020-06-19 10:48:28
+ * @LastEditTime: 2020-06-20 16:21:53
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/args/aboutAdmin.go
@@ -62,7 +62,8 @@ func (info *RegisterParams) SaveToDB() error {
 	var credByte = []byte(cred)
 	hash.Write(credByte)
 	cred = hex.EncodeToString(hash.Sum(nil))
-	utils.TheDB.InsertSQL(theSQL, []interface{}{info.Name, cred, info.Email, info.Phone})
+	var theDB = utils.GetConn()
+	theDB.InsertSQL(theSQL, []interface{}{info.Name, cred, info.Email, info.Phone})
 	return nil
 }
 
@@ -84,7 +85,8 @@ func (info *LoginParams) Check() error {
 		select count(1) from t_user where username=$1 and password=$2;
 	`
 	var n int
-	var err = utils.TheDB.GetOne(theSQL, []interface{}{info.Name, cred}, []interface{}{&n})
+	var theDB = utils.GetConn()
+	var err = theDB.GetOne(theSQL, []interface{}{info.Name, cred}, []interface{}{&n})
 	if err != nil || n == 0 {
 		return errors.New("用户不存在")
 	}
