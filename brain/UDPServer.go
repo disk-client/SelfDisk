@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-30 11:27:16
+ * @LastEditTime: 2020-06-30 11:32:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -78,5 +78,6 @@ func UDPServer() {
 		}
 		var returnContent = []byte("cmd(addr)" + selfDiskIP + ":9201")
 		listener.WriteTo(returnContent, remoteAddr)
+		fmt.Println("消息已发送")
 	}
 }
