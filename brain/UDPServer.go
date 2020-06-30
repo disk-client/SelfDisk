@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-30 10:39:30
+ * @LastEditTime: 2020-06-30 10:40:40
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -76,7 +76,7 @@ func UDPServer() {
 			theSQL = fmt.Sprintf(theSQL, tableName)
 			theDB.UpdateSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
 		}
-		var returnContent = []byte(selfDiskIP + ":" + selfDiskPort)
+		var returnContent = []byte("cmd(addr)" + selfDiskIP + ":" + selfDiskPort)
 		listener.WriteTo(returnContent, remoteAddr)
 	}
 }
