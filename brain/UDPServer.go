@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-20 16:21:02
+ * @LastEditTime: 2020-06-30 10:39:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -28,6 +28,7 @@ func UDPServer() {
 		n, remoteAddr, err := listener.ReadFromUDP(data)
 		if err != nil {
 			fmt.Println("error during read: ", err)
+			continue
 		}
 		var content = string(data[:n])
 		var clientType = content[:1]
@@ -75,5 +76,7 @@ func UDPServer() {
 			theSQL = fmt.Sprintf(theSQL, tableName)
 			theDB.UpdateSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
 		}
+		var returnContent = []byte(selfDiskIP + ":" + selfDiskPort)
+		listener.WriteTo(returnContent, remoteAddr)
 	}
 }
