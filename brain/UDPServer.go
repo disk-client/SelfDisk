@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-30 11:32:52
+ * @LastEditTime: 2020-06-30 13:36:12
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/UDPServer.go
@@ -76,8 +76,18 @@ func UDPServer() {
 			theSQL = fmt.Sprintf(theSQL, tableName)
 			theDB.UpdateSQL(theSQL, []interface{}{selfDiskIP, selfDiskPort, uid})
 		}
-		var returnContent = []byte("cmd(addr)" + selfDiskIP + ":9201")
-		listener.WriteTo(returnContent, remoteAddr)
+		sendMsg(selfDiskIP, "cmd(addr)"+selfDiskIP+":9201", remoteAddr.Port)
 		fmt.Println("消息已发送")
 	}
+}
+
+func sendMsg(host, msg string, port int) {
+	var srcAddr = &net.UDPAddr{IP: net.IPv4zero, Port: 9202} // 注意端口必须固定
+	dstAddr := &net.UDPAddr{IP: net.ParseIP(host), Port: port}
+	conn, err := net.DialUDP("udp", srcAddr, dstAddr)
+	if err != nil {
+		fmt.Println(err)
+	}
+	conn.Write([]byte(msg))
+	conn.Close()
 }
