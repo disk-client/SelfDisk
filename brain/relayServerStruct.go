@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 11:11:05
- * @LastEditTime: 2020-07-01 11:11:20
+ * @LastEditTime: 2020-07-01 11:27:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayServerStruct.go
@@ -10,6 +10,8 @@
 package brain
 
 import (
+	"SelfDisk/utils"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -28,6 +30,15 @@ func (tc *TCPConnect) GetAddr() string {
 }
 
 // CheckAuth 核验身份
-func (tc *TCPConnect) CheckAuth() {
-
+func (tc *TCPConnect) CheckAuth() error {
+	var theSQL = `
+		select count(1) from t_user where username=$1;
+	`
+	var n int
+	var theDB = utils.GetConn()
+	var err = theDB.GetOne(theSQL, []interface{}{tc.Name}, []interface{}{&n})
+	if err != nil || n == 0 {
+		return errors.New("用户不存在")
+	}
+	return nil
 }

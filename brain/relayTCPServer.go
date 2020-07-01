@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-01 10:46:11
+ * @LastEditTime: 2020-07-01 17:09:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -36,12 +36,21 @@ func makeControl() {
 			panic(err)
 		}
 		fmt.Println("新的客户端连接到控制端服务进程:" + tcpConn.RemoteAddr().String())
-		if cache != nil {
-			fmt.Println("已经存在一个客户端连接!")
-			//直接关闭掉多余的客户端请求
-			tcpConn.Close()
+		var content = make([]byte, 1024)
+		n, err := tcpConn.Read(content)
+		if n == 0 {
+			fmt.Println(string(content))
+			fmt.Println(err)
+			continue
 		} else {
-			cache = tcpConn
+			fmt.Println(string(content))
+			if cache != nil {
+				fmt.Println("已经存在一个客户端连接!")
+				//直接关闭掉多余的客户端请求
+				tcpConn.Close()
+			} else {
+				cache = tcpConn
+			}
 		}
 		go control(tcpConn)
 	}
@@ -84,9 +93,9 @@ func makeAccept() {
 
 // ConnMatch 链接匹配
 type ConnMatch struct {
-	accept        *net.TCPConn //8007 tcp链路 accept
+	accept        *net.TCPConn //8087 tcp链路 accept
 	acceptAddTime int64        //接受请求的时间
-	tunnel        *net.TCPConn //8008 tcp链路 tunnel
+	tunnel        *net.TCPConn //8088 tcp链路 tunnel
 }
 
 var connListMap = make(map[string]*ConnMatch)
