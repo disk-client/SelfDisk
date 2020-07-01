@@ -1,7 +1,7 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-13 21:49:06
- * @LastEditTime: 2020-06-19 15:24:22
+ * @LastEditTime: 2020-07-01 09:17:39
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/main.go
@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	go brain.UDPServer()
+	go brain.InitRelayServer()
 	// 生成公私钥
 	utils.InitKeys()
 	var r = gin.Default()
