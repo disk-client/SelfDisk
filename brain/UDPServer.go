@@ -1,11 +1,12 @@
 /*
  * @Author: xiaoboya
  * @Date: 2020-06-15 09:13:40
- * @LastEditTime: 2020-06-30 13:36:12
+ * @LastEditTime: 2020-07-01 09:12:34
  * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
+ * @Description: 早先尝试的UDP式的点对点直连是一个不错的想法，但是最终发现效果查强人意
+                现在已经尝试了基于tcp的转发。虽然受服务器带宽限制比较大，但是我觉得还是可以接受的
  * @FilePath: /SelfDisk/brain/UDPServer.go
- */
+*/
 
 package brain
 
