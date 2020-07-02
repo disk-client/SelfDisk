@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-02 14:40:38
+ * @LastEditTime: 2020-07-02 15:19:26
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -45,10 +45,12 @@ func makeControl() {
 			fmt.Println(err)
 			continue
 		} else {
-			fmt.Println(string(content))
 			var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
 			var port, _ = strconv.Atoi(l[1])
-			var newtcp = TCPConnect{IP: l[0], Port: port, Name: string(content), Conn: tcpConn}
+			var username = string(content)
+			fmt.Println(username)
+			fmt.Println(len(username))
+			var newtcp = TCPConnect{IP: l[0], Port: port, Name: username, Conn: tcpConn}
 			err = newtcp.CheckAuth()
 			if err != nil {
 				newtcp.Conn.Write(([]byte)("fuck\n"))
