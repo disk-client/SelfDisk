@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-01 17:09:29
+ * @LastEditTime: 2020-07-02 13:44:23
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -14,11 +14,14 @@ import (
 	"io"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
 
 var cache *net.TCPConn = nil
+
+var cacheMap = map[string]TCPConnect{}
 
 // makeControl 添加一个tcp端口，用来接收客户端发送的tcp链接
 func makeControl() {
@@ -39,33 +42,37 @@ func makeControl() {
 		var content = make([]byte, 1024)
 		n, err := tcpConn.Read(content)
 		if n == 0 {
-			fmt.Println(string(content))
 			fmt.Println(err)
 			continue
 		} else {
 			fmt.Println(string(content))
-			if cache != nil {
-				fmt.Println("已经存在一个客户端连接!")
-				//直接关闭掉多余的客户端请求
-				tcpConn.Close()
-			} else {
-				cache = tcpConn
+			var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
+			var port, _ = strconv.Atoi(l[1])
+			var newtcp = TCPConnect{IP: l[0], Port: port, Name: string(content)}
+			err = newtcp.CheckAuth()
+			if err != nil {
+				newtcp.Conn.Write(([]byte)("fuck\n"))
+			}
+			if _, ok := cacheMap[newtcp.Name]; !ok {
+				cacheMap[newtcp.Name] = newtcp
+				cache = newtcp.Conn
 			}
 		}
-		go control(tcpConn)
 	}
 }
 
 //一旦有客户端连接到服务端的话，服务端每隔2秒发送hi消息给到客户端
 //如果发送不出去，则认为链路断了，清除cache连接
-func control(conn *net.TCPConn) {
+func control() {
 	go func() {
 		for {
-			_, e := conn.Write(([]byte)("hi\n"))
-			if e != nil {
-				cache = nil
+			for k, v := range cacheMap {
+				_, e := v.Conn.Write(([]byte)("hi\n"))
+				if e != nil {
+					delete(cacheMap, k)
+				}
 			}
-			time.Sleep(time.Second * 2)
+			time.Sleep(time.Second * 1)
 		}
 	}()
 }
@@ -101,6 +108,7 @@ type ConnMatch struct {
 var connListMap = make(map[string]*ConnMatch)
 var lock = sync.Mutex{}
 
+// 加入匹配（匹配客户端和服务端）
 func addConnMathAccept(accept *net.TCPConn) {
 	//加锁防止竞争读写map
 	lock.Lock()
@@ -109,6 +117,7 @@ func addConnMathAccept(accept *net.TCPConn) {
 	connListMap[strconv.FormatInt(now, 10)] = &ConnMatch{accept, time.Now().Unix(), nil}
 }
 
+// 新起链路去链接
 func sendMessage(message string) {
 	fmt.Println("send Message " + message)
 	if cache != nil {
@@ -230,6 +239,8 @@ func releaseConnMatch() {
 
 // InitRelayServer 初始化转发服务
 func InitRelayServer() {
+	// 控制和tcp保持链接
+	go control()
 	//监听控制端口8009
 	go makeControl()
 	//监听服务端口8007

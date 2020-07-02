@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 11:11:05
- * @LastEditTime: 2020-07-01 11:27:37
+ * @LastEditTime: 2020-07-02 09:33:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayServerStruct.go
@@ -13,6 +13,7 @@ import (
 	"SelfDisk/utils"
 	"errors"
 	"fmt"
+	"net"
 	"strconv"
 )
 
@@ -21,6 +22,7 @@ type TCPConnect struct {
 	IP   string
 	Port int
 	Name string
+	Conn *net.TCPConn
 }
 
 // GetAddr 获取地址
