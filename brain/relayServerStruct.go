@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 11:11:05
- * @LastEditTime: 2020-07-02 09:33:46
+ * @LastEditTime: 2020-07-02 14:38:29
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayServerStruct.go
@@ -43,4 +43,10 @@ func (tc *TCPConnect) CheckAuth() error {
 		return errors.New("用户不存在")
 	}
 	return nil
+}
+
+// TCPSession tcp对话
+type TCPSession struct {
+	Server *net.TCPConn
+	Client *net.TCPConn
 }
