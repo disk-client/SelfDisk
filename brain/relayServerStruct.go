@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 11:11:05
- * @LastEditTime: 2020-07-02 14:38:29
+ * @LastEditTime: 2020-07-02 15:10:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayServerStruct.go
@@ -40,6 +40,7 @@ func (tc *TCPConnect) CheckAuth() error {
 	var theDB = utils.GetConn()
 	var err = theDB.GetOne(theSQL, []interface{}{tc.Name}, []interface{}{&n})
 	if err != nil || n == 0 {
+		fmt.Println(err)
 		return errors.New("用户不存在")
 	}
 	return nil
