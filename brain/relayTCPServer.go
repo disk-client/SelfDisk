@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-03 10:39:33
+ * @LastEditTime: 2020-07-03 10:52:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -160,6 +160,8 @@ func makeForward() {
 var connListMapUpdate = make(chan int)
 
 func configConnListTunnel(tunnel *net.TCPConn, ip string) {
+	fmt.Println(ip)
+	fmt.Println(cacheMap)
 	if _, ok := cacheMap[ip]; !ok {
 		tunnel.Close()
 		fmt.Println("关闭多余的tunnel")
