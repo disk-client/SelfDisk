@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-03 11:27:05
+ * @LastEditTime: 2020-07-03 20:26:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -18,13 +18,13 @@ import (
 	"time"
 )
 
-var cache *net.TCPConn = nil
-
 // cacheMap ip:信息
 // 但是我现在比较怀疑是不是有不要写个这个变量……
 // 可能是我用的地方不太对吧……
 // 淦！
 var cacheMap = map[string]TCPConnect{}
+
+var clientMap = map[string]string{}
 
 // makeControl 添加一个tcp端口，用来接收客户端发送的tcp链接
 func makeControl() {
@@ -58,7 +58,6 @@ func makeControl() {
 			}
 			if _, ok := cacheMap[l[0]]; !ok {
 				cacheMap[l[0]] = newtcp
-				cache = newtcp.Conn
 			}
 		}
 	}
@@ -115,22 +114,41 @@ func addConnMathAccept(accept *net.TCPConn, username string) {
 	// 这里或者执行到这个函数之前需要进行一次用户认证
 	if _, ok := connListMap[username]; !ok {
 		connListMap[username] = &ConnMatch{accept, time.Now().Unix(), nil}
-		sendMessage("new\n")
+		var clientIP = strings.Split(accept.RemoteAddr().String(), ":")[0]
+		if _, ok := clientMap[clientIP]; !ok {
+			var content = make([]byte, 1024)
+			n, err := accept.Read(content)
+			if err != nil {
+				return
+			}
+			var username = string(content[:n])
+			clientMap[clientIP] = username
+		}
+
+		sendMessage("new\n", clientIP)
 	}
 }
 
 // 新起链路去链接
-func sendMessage(message string) {
+func sendMessage(message string, clientIP string) {
 	fmt.Println("send Message " + message)
-	if cache != nil {
-		_, e := cache.Write([]byte(message))
-		if e != nil {
-			fmt.Println("消息发送异常")
-			fmt.Println(e.Error())
-		}
-	} else {
+	username, ok := clientMap[clientIP]
+	if !ok {
 		fmt.Println("没有客户端连接，无法发送消息")
 	}
+	for _, v := range cacheMap {
+		if v.Name == username {
+			_, e := v.Conn.Write([]byte(message))
+			if e != nil {
+				fmt.Println("消息发送异常")
+				fmt.Println(e.Error())
+			} else {
+				fmt.Println("没有客户端连接，无法发送消息")
+			}
+			return
+		}
+	}
+	fmt.Println("没有客户端连接，无法发送消息")
 }
 
 // makeForward 建立第三个tcp接受数据包
