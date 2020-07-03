@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-03 11:20:19
+ * @LastEditTime: 2020-07-03 11:27:05
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -198,9 +198,8 @@ func tcpForward() {
 
 func joinConn2(conn1 *net.TCPConn, conn2 *net.TCPConn) {
 	var f = func(local *net.TCPConn, remote *net.TCPConn) {
-		//defer保证close
-		// defer local.Close()
-		// defer remote.Close()
+		defer local.Close()
+		defer remote.Close()
 		//使用io.Copy传输两个tcp连接，
 		_, err := io.Copy(local, remote)
 		if err != nil {
