@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-03 10:52:44
+ * @LastEditTime: 2020-07-03 10:56:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -151,7 +151,7 @@ func makeForward() {
 		}
 		fmt.Println("A client connected 8088 :" + tcpConn.RemoteAddr().String())
 		var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
-		var ip = l[1]
+		var ip = l[0]
 		configConnListTunnel(tcpConn, ip)
 	}
 }
