@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-02 15:23:35
+ * @LastEditTime: 2020-07-03 10:39:33
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -15,12 +15,15 @@ import (
 	"net"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
 var cache *net.TCPConn = nil
 
+// cacheMap ip:信息
+// 但是我现在比较怀疑是不是有不要写个这个变量……
+// 可能是我用的地方不太对吧……
+// 淦！
 var cacheMap = map[string]TCPConnect{}
 
 // makeControl 添加一个tcp端口，用来接收客户端发送的tcp链接
@@ -48,15 +51,13 @@ func makeControl() {
 			var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
 			var port, _ = strconv.Atoi(l[1])
 			var username = string(content[:n])
-			fmt.Println(username)
-			fmt.Println(len(username))
 			var newtcp = TCPConnect{IP: l[0], Port: port, Name: username, Conn: tcpConn}
 			err = newtcp.CheckAuth()
 			if err != nil {
 				newtcp.Conn.Write(([]byte)("fuck\n"))
 			}
-			if _, ok := cacheMap[newtcp.Name]; !ok {
-				cacheMap[newtcp.Name] = newtcp
+			if _, ok := cacheMap[l[0]]; !ok {
+				cacheMap[l[0]] = newtcp
 				cache = newtcp.Conn
 			}
 		}
@@ -95,8 +96,8 @@ func makeAccept() {
 			continue
 		}
 		fmt.Println("A client connected 8087:" + tcpConn.RemoteAddr().String())
-		addConnMathAccept(tcpConn)
-		sendMessage("new\n")
+		// 这里是希望去开多个协程，好处理多个转发问题
+		go addConnMathAccept(tcpConn, "xiaoboya")
 	}
 }
 
@@ -108,15 +109,14 @@ type ConnMatch struct {
 }
 
 var connListMap = make(map[string]*ConnMatch)
-var lock = sync.Mutex{}
 
 // 加入匹配（匹配客户端和服务端）
-func addConnMathAccept(accept *net.TCPConn) {
-	//加锁防止竞争读写map
-	lock.Lock()
-	defer lock.Unlock()
-	now := time.Now().UnixNano()
-	connListMap[strconv.FormatInt(now, 10)] = &ConnMatch{accept, time.Now().Unix(), nil}
+func addConnMathAccept(accept *net.TCPConn, username string) {
+	// 这里或者执行到这个函数之前需要进行一次用户认证
+	if _, ok := connListMap[username]; !ok {
+		connListMap[username] = &ConnMatch{accept, time.Now().Unix(), nil}
+		sendMessage("new\n")
+	}
 }
 
 // 新起链路去链接
@@ -150,35 +150,29 @@ func makeForward() {
 			continue
 		}
 		fmt.Println("A client connected 8088 :" + tcpConn.RemoteAddr().String())
-		configConnListTunnel(tcpConn)
+		var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
+		var ip = l[1]
+		configConnListTunnel(tcpConn, ip)
 	}
 }
 
 // connListMapUpdate 通道用于更新
 var connListMapUpdate = make(chan int)
 
-func configConnListTunnel(tunnel *net.TCPConn) {
-	//加锁解决竞争问题
-	lock.Lock()
-	used := false
-	for _, connMatch := range connListMap {
-		//找到tunnel为nil的而且accept不为nil的connMatch
-		if connMatch.tunnel == nil && connMatch.accept != nil {
-			//填充tunnel链路
-			connMatch.tunnel = tunnel
-			used = true
-			//这里要break，是防止这条链路被赋值到多个connMatch！
-			break
-		}
-	}
-	if !used {
-		//如果没有被使用的话，则说明所有的connMatch都已经配对好了，直接关闭多余的8008链路
-		fmt.Println(len(connListMap))
-		_ = tunnel.Close()
+func configConnListTunnel(tunnel *net.TCPConn, ip string) {
+	if _, ok := cacheMap[ip]; !ok {
+		tunnel.Close()
 		fmt.Println("关闭多余的tunnel")
+		return
 	}
-	lock.Unlock()
-	//使用channel机制来告诉另一个方法已经就绪
+	var name = cacheMap[ip].Name
+	v, ok := connListMap[name]
+	if !ok || v.tunnel == nil {
+		tunnel.Close()
+		fmt.Println("关闭多余的tunnel")
+		return
+	}
+	connListMap[name].tunnel = tunnel
 	connListMapUpdate <- 1
 }
 
@@ -186,7 +180,6 @@ func tcpForward() {
 	for {
 		select {
 		case <-connListMapUpdate:
-			lock.Lock()
 			for key, connMatch := range connListMap {
 				//如果两个都不为空的话，建立隧道连接
 				if connMatch.tunnel != nil && connMatch.accept != nil {
@@ -196,7 +189,6 @@ func tcpForward() {
 					delete(connListMap, key)
 				}
 			}
-			lock.Unlock()
 		}
 	}
 }
@@ -220,7 +212,6 @@ func joinConn2(conn1 *net.TCPConn, conn2 *net.TCPConn) {
 
 func releaseConnMatch() {
 	for {
-		lock.Lock()
 		for key, connMatch := range connListMap {
 			//如果在指定时间内没有tunnel的话，则释放该连接
 			if connMatch.tunnel == nil && connMatch.accept != nil {
@@ -234,7 +225,6 @@ func releaseConnMatch() {
 				}
 			}
 		}
-		lock.Unlock()
 		time.Sleep(5 * time.Second)
 	}
 }
