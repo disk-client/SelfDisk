@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 11:58:05
+ * @LastEditTime: 2020-07-25 12:27:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -172,6 +172,7 @@ func sendMessage(message string, clientIP string) {
 	fmt.Println("send Message " + message)
 	username, ok := clientMap[clientIP]
 	if !ok {
+		fmt.Println("1111")
 		fmt.Println("没有客户端连接，无法发送消息")
 	}
 	for _, v := range cacheMap {
@@ -181,7 +182,7 @@ func sendMessage(message string, clientIP string) {
 				fmt.Println("消息发送异常")
 				fmt.Println(e.Error())
 			} else {
-				fmt.Println("没有客户端连接，无法发送消息")
+				fmt.Println("客户端连接，发送消息成功")
 			}
 			return
 		}
