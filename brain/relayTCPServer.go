@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 15:06:43
+ * @LastEditTime: 2020-07-25 15:16:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -104,9 +104,9 @@ func makeAccept() {
 			fmt.Println(err)
 			return
 		}
-		b, err = utils.AesDecrypt(b, utils.AesKey)
+		aesDecryptByteList, err := utils.AesDecrypt(b[:n], utils.AesKey)
 		if err == nil {
-			var content = string(b[:n])
+			var content = string(aesDecryptByteList)
 			fmt.Println(content)
 			if len(content) > 6 && content[0:6] == "CLIENT" {
 				fmt.Println(content)
