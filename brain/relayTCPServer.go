@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 12:27:51
+ * @LastEditTime: 2020-07-25 13:49:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -170,11 +170,14 @@ func addConnMathAccept(accept *net.TCPConn, username string) {
 // 新起链路去链接
 func sendMessage(message string, clientIP string) {
 	fmt.Println("send Message " + message)
+	fmt.Println(clientIP)
 	username, ok := clientMap[clientIP]
+	fmt.Println(username)
 	if !ok {
 		fmt.Println("1111")
 		fmt.Println("没有客户端连接，无法发送消息")
 	}
+	fmt.Println(cacheMap)
 	for _, v := range cacheMap {
 		if v.Name == username {
 			_, e := v.Conn.Write([]byte(message))
