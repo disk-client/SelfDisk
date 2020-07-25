@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-03 20:26:30
+ * @LastEditTime: 2020-07-25 10:47:24
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -10,8 +10,10 @@
 package brain
 
 import (
+	"SelfDisk/utils"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"strconv"
 	"strings"
@@ -94,9 +96,38 @@ func makeAccept() {
 			fmt.Println(err)
 			continue
 		}
-		fmt.Println("A client connected 8087:" + tcpConn.RemoteAddr().String())
+		var addr = tcpConn.RemoteAddr().String()
+		fmt.Println("A client connected 8087:" + addr)
+		var username string
+		f, _ := ioutil.ReadAll(tcpConn)
+		b, err := utils.AesDecrypt(f, utils.AesKey)
+		if err == nil {
+			var content = string(b)
+			if len(content) > 6 && content[0:6] == "CLIENT" {
+				var neededContent = content[6:]
+				var contentList = strings.Split(neededContent, "||")
+				if len(contentList) != 2 {
+					return
+				}
+				var timeStr = contentList[0]
+				username = contentList[1]
+				stamp, _ := time.ParseInLocation("2006-01-02 15:04:05", timeStr, time.Local)
+				var nowTime = time.Now()
+				if nowTime.Unix()-stamp.Unix() > 10 {
+					return
+				}
+			}
+		} else {
+			var addrList = strings.Split(addr, ":")
+			var ip = addrList[0]
+			v, ok := clientMap[ip]
+			if !ok {
+				return
+			}
+			username = v
+		}
 		// 这里是希望去开多个协程，好处理多个转发问题
-		go addConnMathAccept(tcpConn, "xiaoboya")
+		go addConnMathAccept(tcpConn, username)
 	}
 }
 
