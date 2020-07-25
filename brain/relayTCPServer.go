@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 11:12:31
+ * @LastEditTime: 2020-07-25 11:27:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -110,6 +110,7 @@ type ConnMatch struct {
 var connListMap = make(map[string]*ConnMatch)
 
 func checkClientAuth(accept *net.TCPConn) {
+	fmt.Println(1111)
 	var addr = accept.RemoteAddr().String()
 	fmt.Println("A client connected 8087:" + addr)
 	var username string
