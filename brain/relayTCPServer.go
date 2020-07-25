@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 13:58:31
+ * @LastEditTime: 2020-07-25 14:40:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -13,7 +13,6 @@ import (
 	"SelfDisk/utils"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"strconv"
 	"strings"
@@ -99,12 +98,17 @@ func makeAccept() {
 		var addr = tcpConn.RemoteAddr().String()
 		fmt.Println("A client connected 8087:" + addr)
 		var username string
-		f, err := ioutil.ReadAll(tcpConn)
+		var isLen = make([]byte, 1024)
+		n, err := tcpConn.Read(isLen)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(string(f))
+		var l = string(isLen[:n])
+		lInt, _ := strconv.Atoi(l)
+		var f = make([]byte, lInt)
+		_, err = tcpConn.Read(f)
+		fmt.Println(err)
 		b, err := utils.AesDecrypt(f, utils.AesKey)
 		if err == nil {
 			var content = string(b)
@@ -157,12 +161,6 @@ func addConnMathAccept(accept *net.TCPConn, username string) {
 		connListMap[username] = &ConnMatch{accept, time.Now().Unix(), nil}
 		var clientIP = strings.Split(accept.RemoteAddr().String(), ":")[0]
 		if _, ok := clientMap[clientIP]; !ok {
-			// var content = make([]byte, 1024)
-			// n, err := accept.Read(content)
-			// if err != nil {
-			// 	return
-			// }
-			// var username = string(content[:n])
 			clientMap[clientIP] = username
 		}
 
