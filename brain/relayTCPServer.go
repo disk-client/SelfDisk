@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 13:56:39
+ * @LastEditTime: 2020-07-25 13:58:31
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -98,7 +98,7 @@ func makeAccept() {
 		}
 		var addr = tcpConn.RemoteAddr().String()
 		fmt.Println("A client connected 8087:" + addr)
-		// var username string
+		var username string
 		f, err := ioutil.ReadAll(tcpConn)
 		if err != nil {
 			fmt.Println(err)
@@ -109,35 +109,35 @@ func makeAccept() {
 		if err == nil {
 			var content = string(b)
 			fmt.Println(content)
-			// 	if len(content) > 6 && content[0:6] == "CLIENT" {
-			// 		fmt.Println(content)
-			// 		var neededContent = content[6:]
-			// 		fmt.Println(neededContent)
-			// 		var contentList = strings.Split(neededContent, "||")
-			// 		if len(contentList) != 2 {
-			// 			return
-			// 		}
-			// 		var timeStr = contentList[0]
-			// 		username = contentList[1]
-			// 		stamp, _ := time.ParseInLocation("2006-01-02 15:04:05", timeStr, time.Local)
-			// 		var nowTime = time.Now()
-			// 		if nowTime.Unix()-stamp.Unix() > 10 {
-			// 			return
-			// 		}
-			// 	}
-			// } else {
-			// 	fmt.Println(err)
-			// 	var addrList = strings.Split(addr, ":")
-			// 	var ip = addrList[0]
-			// 	v, ok := clientMap[ip]
-			// 	if !ok {
-			// 		return
-			// 	}
-			// 	username = v
+			if len(content) > 6 && content[0:6] == "CLIENT" {
+				fmt.Println(content)
+				var neededContent = content[6:]
+				fmt.Println(neededContent)
+				var contentList = strings.Split(neededContent, "||")
+				if len(contentList) != 2 {
+					return
+				}
+				var timeStr = contentList[0]
+				username = contentList[1]
+				stamp, _ := time.ParseInLocation("2006-01-02 15:04:05", timeStr, time.Local)
+				var nowTime = time.Now()
+				if nowTime.Unix()-stamp.Unix() > 10 {
+					return
+				}
+			}
+		} else {
+			fmt.Println(err)
+			var addrList = strings.Split(addr, ":")
+			var ip = addrList[0]
+			v, ok := clientMap[ip]
+			if !ok {
+				return
+			}
+			username = v
 		}
 		// 这里是希望去开多个协程，好处理多个转发问题
 		// go addConnMathAccept(tcpConn, username)
-		go addConnMathAccept(tcpConn, "xiaoboya")
+		go addConnMathAccept(tcpConn, username)
 	}
 }
 
@@ -157,12 +157,12 @@ func addConnMathAccept(accept *net.TCPConn, username string) {
 		connListMap[username] = &ConnMatch{accept, time.Now().Unix(), nil}
 		var clientIP = strings.Split(accept.RemoteAddr().String(), ":")[0]
 		if _, ok := clientMap[clientIP]; !ok {
-			var content = make([]byte, 1024)
-			n, err := accept.Read(content)
-			if err != nil {
-				return
-			}
-			var username = string(content[:n])
+			// var content = make([]byte, 1024)
+			// n, err := accept.Read(content)
+			// if err != nil {
+			// 	return
+			// }
+			// var username = string(content[:n])
 			clientMap[clientIP] = username
 		}
 
