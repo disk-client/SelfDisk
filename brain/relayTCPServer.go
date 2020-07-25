@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 14:40:30
+ * @LastEditTime: 2020-07-25 14:52:24
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -98,20 +98,15 @@ func makeAccept() {
 		var addr = tcpConn.RemoteAddr().String()
 		fmt.Println("A client connected 8087:" + addr)
 		var username string
-		var isLen = make([]byte, 1024)
-		n, err := tcpConn.Read(isLen)
+		var b = make([]byte, 1024)
+		n, err := tcpConn.Read(b)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		var l = string(isLen[:n])
-		lInt, _ := strconv.Atoi(l)
-		var f = make([]byte, lInt)
-		_, err = tcpConn.Read(f)
-		fmt.Println(err)
-		b, err := utils.AesDecrypt(f, utils.AesKey)
+		b, err = utils.AesDecrypt(b, utils.AesKey)
 		if err == nil {
-			var content = string(b)
+			var content = string(b[:n])
 			fmt.Println(content)
 			if len(content) > 6 && content[0:6] == "CLIENT" {
 				fmt.Println(content)
