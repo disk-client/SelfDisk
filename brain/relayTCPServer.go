@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-25 16:00:23
+ * @LastEditTime: 2020-07-27 09:49:31
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -43,7 +43,7 @@ func makeControl() {
 			panic(err)
 		}
 		fmt.Println("新的客户端连接到控制端服务进程:" + tcpConn.RemoteAddr().String())
-		var content = make([]byte, 1024)
+		var content = make([]byte, 2048)
 		n, err := tcpConn.Read(content)
 		if n == 0 {
 			fmt.Println(err)
@@ -51,7 +51,23 @@ func makeControl() {
 		} else {
 			var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
 			var port, _ = strconv.Atoi(l[1])
-			var username = string(content[:n])
+			var realContent = content[:n]
+			realContent, err := utils.AesDecrypt(realContent, utils.AesKey)
+			if err != nil {
+				return
+			}
+			var contentStr = string(realContent)
+			if contentStr[:6] != "SERVER" {
+				return
+			}
+			var paramsList = strings.Split(contentStr[6:], "||")
+			var t = paramsList[0]
+			stamp, _ := time.ParseInLocation("2006-01-02 15:04:05", t, time.Local)
+			var nowTime = time.Now()
+			if nowTime.Unix()-stamp.Unix() > 10 {
+				return
+			}
+			var username = paramsList[1]
 			var newtcp = TCPConnect{IP: l[0], Port: port, Name: username, Conn: tcpConn}
 			err = newtcp.CheckAuth()
 			if err != nil {
@@ -286,11 +302,11 @@ func releaseConnMatch() {
 func InitRelayServer() {
 	// 控制和tcp保持链接
 	go control()
-	//监听控制端口8009
+	//监听控制端口8089
 	go makeControl()
-	//监听服务端口8007
+	//监听服务端口8087
 	go makeAccept()
-	//监听转发端口8008
+	//监听转发端口8088
 	go makeForward()
 	//定时释放连接
 	go releaseConnMatch()
