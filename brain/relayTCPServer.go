@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-01 09:15:29
- * @LastEditTime: 2020-07-27 09:49:31
+ * @LastEditTime: 2020-07-29 20:59:54
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /SelfDisk/brain/relayTCPServer.go
@@ -52,6 +52,7 @@ func makeControl() {
 			var l = strings.Split(tcpConn.RemoteAddr().String(), ":")
 			var port, _ = strconv.Atoi(l[1])
 			var realContent = content[:n]
+			fmt.Println(n)
 			realContent, err := utils.AesDecrypt(realContent, utils.AesKey)
 			if err != nil {
 				return
